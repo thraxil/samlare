@@ -1,8 +1,8 @@
 package main // github.com/thraxil/samlare
 
 import (
+	"context"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -51,18 +51,45 @@ func main() {
 		return
 	}
 
+	sigs := make(chan os.Signal, 1)
+
+	cancel := startEndpoints(conf, logger)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	for {
+		s := <-sigs
+		if s == syscall.SIGHUP {
+			logger.Log("msg", "received SIGHUP. reloading")
+			// reload config
+			conf, err = loadConfig(*configFile)
+			if err != nil {
+				// instead of returning, we keep running with the old config
+				// logging the fact that there was an error
+				logger.Log("msg", "error reloading config file", "error", err)
+			} else {
+				// kill existing endpoints
+				cancel()
+				// and restart them with the new config
+				cancel = startEndpoints(conf, logger)
+			}
+		} else {
+			logger.Log("msg", "exiting")
+			cancel()
+			return
+		}
+	}
+}
+
+func startEndpoints(conf *config, logger log.Logger) context.CancelFunc {
+	ctx, cancel := context.WithCancel(context.Background())
+
 	g := newGraphiteServer(conf.CarbonHost, conf.CarbonPort)
 
-	sigs := make(chan os.Signal, 1)
 	for k, endpoint := range conf.Endpoints {
-		fmt.Println(k)
-		fmt.Println(endpoint.URL)
 		elogger := log.With(logger, "endpoint", k)
 		e := newEndpoint(endpoint, conf.CheckInterval, conf.Timeout, g, httpFetcher{}, elogger)
-		go e.Run()
+		go e.Run(ctx)
 	}
 
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	<-sigs
-	logger.Log("msg", "exiting")
+	return cancel
 }

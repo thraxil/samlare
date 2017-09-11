@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -118,11 +119,17 @@ func (e *endpoint) Submit(metrics []metric) {
 	}
 }
 
-func (e *endpoint) Run() {
+func (e *endpoint) Run(ctx context.Context) {
+	e.logger.Log("msg", "endpoint starting")
 	for {
-		metrics := e.Gather()
-		e.Submit(metrics)
 		jitter := rand.Intn(e.checkInterval / 10)
-		time.Sleep(time.Duration(e.checkInterval+jitter) * time.Second)
+		select {
+		case <-ctx.Done():
+			e.logger.Log("msg", "context cancelled. exiting")
+			return
+		case <-time.After(time.Duration(e.checkInterval+jitter) * time.Second):
+			metrics := e.Gather()
+			e.Submit(metrics)
+		}
 	}
 }
