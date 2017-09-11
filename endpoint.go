@@ -86,13 +86,25 @@ func (e *endpoint) Gather() []metric {
 	}
 	e.logger.Log("msg", "good fetch")
 
+	metrics = metricsFromMap(m, e.prefix)
+
+	return metrics
+}
+
+func metricsFromMap(m map[string]interface{}, prefix string) []metric {
+	var metrics []metric
 	for k, v := range m {
-		key := fmt.Sprintf("%s.%s", e.prefix, k)
+		key := fmt.Sprintf("%s.%s", prefix, k)
 		switch vv := v.(type) {
 		case int:
 			metrics = append(metrics, metric{key, float64(vv)})
 		case float64:
 			metrics = append(metrics, metric{key, vv})
+		case map[string]interface{}:
+			nmetrics := metricsFromMap(vv, key)
+			for _, met := range nmetrics {
+				metrics = append(metrics, met)
+			}
 		}
 		// default: nothing to do
 	}
