@@ -27,6 +27,14 @@ type config struct {
 	Endpoints map[string]endpointconfig
 }
 
+func loadConfig(configFile string) (*config, error) {
+	var conf config
+	if _, err := toml.DecodeFile(configFile, &conf); err != nil {
+		return nil, err
+	}
+	return &conf, nil
+}
+
 func main() {
 	configFile := flag.String("config", "/etc/samlare/config.toml", "config file location")
 	flag.Parse()
@@ -37,8 +45,8 @@ func main() {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
 	logger.Log("msg", "starting")
 
-	var conf config
-	if _, err := toml.DecodeFile(*configFile, &conf); err != nil {
+	conf, err := loadConfig(*configFile)
+	if err != nil {
 		logger.Log("msg", "error loading config file", "error", err)
 		return
 	}
