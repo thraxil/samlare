@@ -1,0 +1,14 @@
+CarbonHost = "graphite.example.com"
+CarbonPort = 2003
+CheckInterval = 60
+Timeout = 3000
+
+[endpoints]
+
+  [endpoints.app1]
+	URL = "http://localhost:14001/debug/vars"
+	Prefix = "apps.app1"
+
+  [endpoints.app2]
+	URL = "http://localhost:14002/debug/vars"
+	Prefix = "apps.app2"
