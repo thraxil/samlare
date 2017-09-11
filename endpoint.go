@@ -13,7 +13,7 @@ import (
 )
 
 type fetcher interface {
-	Get(string, time.Duration) (*http.Response, error)
+	Get(context.Context, string) (*http.Response, error)
 }
 
 type httpFetcher struct{}
@@ -52,16 +52,14 @@ func newEndpoint(c endpointconfig, interval int, timeout int, g *graphiteServer,
 	}
 }
 
-func (h httpFetcher) Get(url string, timeout time.Duration) (*http.Response, error) {
-	client := http.Client{
-		Timeout: timeout,
-	}
-	return client.Get(url)
+func (h httpFetcher) Get(ctx context.Context, url string) (*http.Response, error) {
+	req, _ := http.NewRequest("GET", url, nil)
+	return http.DefaultClient.Do(req.WithContext(ctx))
 }
 
-func (e *endpoint) Fetch() (map[string]interface{}, error) {
-	timeout := time.Duration(e.timeout * int(time.Millisecond))
-	resp, err := e.fetcher.Get(e.url, timeout)
+func (e *endpoint) Fetch(ctx context.Context) (map[string]interface{}, error) {
+	ctx, _ = context.WithTimeout(ctx, time.Duration(e.timeout*int(time.Millisecond)))
+	resp, err := e.fetcher.Get(ctx, e.url)
 	if err != nil {
 		return nil, err
 	}
@@ -78,9 +76,9 @@ func (e *endpoint) Fetch() (map[string]interface{}, error) {
 	return f.(map[string]interface{}), nil
 }
 
-func (e *endpoint) Gather() []metric {
+func (e *endpoint) Gather(ctx context.Context) []metric {
 	var metrics []metric
-	m, err := e.Fetch()
+	m, err := e.Fetch(ctx)
 	if err != nil {
 		e.logger.Log("msg", "fetch failed", "error", err)
 		return metrics
@@ -128,7 +126,7 @@ func (e *endpoint) Run(ctx context.Context) {
 			e.logger.Log("msg", "context cancelled. exiting")
 			return
 		case <-time.After(time.Duration(e.checkInterval+jitter) * time.Second):
-			metrics := e.Gather()
+			metrics := e.Gather(ctx)
 			e.Submit(metrics)
 		}
 	}
