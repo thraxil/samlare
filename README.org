@@ -68,3 +68,7 @@ file. This is particularly handy if you use something like
 consul-template to generate your config file automatically.
 
 Samlare logs to ~STDOUT~ in a nice JSON format.
+
+Samlare adds a random 10% jitter to the ~CheckInterval~ for each
+metric. Ie, if it's set to 60 seconds, the actual interval will be
+some random value between 60-66 seconds. This prevents [[https://en.wikipedia.org/wiki/Thundering_herd_problem][thundering herd problems]].
