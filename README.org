@@ -15,7 +15,11 @@ Docker image also coming soon.
 
 The only commandline argument it takes is a path to a config file (it
 will default to looking for ~/etc/samlare/config.toml~ if you don't
-specify a path).
+specify a path):
+
+#+BEGIN_EXAMPLE
+$ samlare -config=/path/to/my/config.toml
+#+END_EXAMPLE
 
 That's a TOML file with a fairly simple format.
 
