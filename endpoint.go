@@ -58,7 +58,8 @@ func (h httpFetcher) Get(ctx context.Context, url string) (*http.Response, error
 }
 
 func (e *endpoint) Fetch(ctx context.Context) (map[string]interface{}, error) {
-	ctx, _ = context.WithTimeout(ctx, time.Duration(e.timeout*int(time.Millisecond)))
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(e.timeout*int(time.Millisecond)))
+	defer cancel()
 	resp, err := e.fetcher.Get(ctx, e.url)
 	if err != nil {
 		return nil, err
