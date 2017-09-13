@@ -1,0 +1,11 @@
+language: go
+go: 1.8
+sudo: false
+dist: trusty
+
+before_install:
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+
+script:
+  - goveralls -service=travis-ci -package=.
