@@ -1,7 +1,7 @@
 * samlare
 
 Samlare (it means "collector/gatherer" in swedish) is a simple tool
-for collecting data from expvar endpoints and submitting it to
+for collecting data from [[[[https://golang.org/pkg/expvar/]]][expvar]] endpoints and submitting it to
 graphite.
 
 ** Installation
@@ -66,3 +66,5 @@ each endpoint as well.
 Samlare will respond to a ~SIGHUP~ signal by reloading its config
 file. This is particularly handy if you use something like
 consul-template to generate your config file automatically.
+
+Samlare logs to ~STDOUT~ in a nice JSON format.
