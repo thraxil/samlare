@@ -64,7 +64,7 @@ func (e *endpoint) Fetch(ctx context.Context) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	if resp.Status != http.StatusOK {
+	if resp.Status != "200 OK" {
 		return nil, err
 	}
 	defer resp.Body.Close()
