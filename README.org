@@ -6,11 +6,12 @@ for collecting data from [[https://golang.org/pkg/expvar/][expvar]] endpoints an
 
 ** Installation
 
-It's available for Linux as a plain binary (other platforms coming
-soon). Download it from the releases and put it in your path.
+It's available for Linux as a plain binary for linux or OS X (let me
+know if you need it for other platforms). Download it from the
+[[https://github.com/thraxil/samlare/releases][releases]] and put it in your path (and probably rename it, set
+permissions, etc).
 
 Docker image also coming soon.
-
 ** Configuration
 
 The only commandline argument it takes is a path to a config file (it
