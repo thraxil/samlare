@@ -13,4 +13,12 @@ func Test_metricsFromMap(t *testing.T) {
 	if len(metrics) != 2 {
 		t.Error("wrong number of metrics found")
 	}
+
+	data = `{"foo": 10, "bar": 5, "baz": {"blah": 3}}`
+	json.Unmarshal([]byte(data), &f)
+	metrics = metricsFromMap(f.(map[string]interface{}), "")
+	if len(metrics) != 3 {
+		t.Error("wrong number of metrics found")
+	}
+
 }
