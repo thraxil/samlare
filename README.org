@@ -1,4 +1,4 @@
-
+[[https://travis-ci.org/thraxil/samlare][https://travis-ci.org/thraxil/samlare.svg?branch=master]]
 [[https://coveralls.io/github/thraxil/samlare?branch%3Dmaster][https://coveralls.io/repos/github/thraxil/samlare/badge.svg?branch=master]]
 
 
