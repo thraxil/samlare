@@ -18,11 +18,11 @@ before_deploy:
 - GOOS=darwin  GOARCH=amd64 go build -o release/samlare-v$VERSION-darwin-amd64
 deploy:
   provider: releases
+  api_key:
+    secure: AtTrfGGDMwD0GwyxLSul7vjarMtsT3sTjBZ9FGoErjUanlAwcHrSYWqsKcfFa5MOacabQdduAoPCUT9li3z43W+mlgx1Jzh8Le/4/j5q5Pxav4bapCRgqto5xl69w2zlioZ7g3wcs9Ycr+OypbQ0F8xgdN0kYSXdhsjakrRqcPlxpql8JVOjhNo/bX3TBrR2vVV74dBH/aYAfeOBZyJI7AMxfPXUX7W/Nq57/nJMPmU63nTJUVbpsddg6a5CmNx238ejayZimw1Ka8cPJHyYn61h+ATYtBRZj3yefD2kbFKkwjICD+HeqtiObwBF6r2nygZ1p+EORL/QgPnqsHMZQMLZoGJcFW2KchaADGE2VuIOSRYGQLF+GgAXAFm4ci7/5kCOMirn5SQ59OylzaVyDDeQ1e0DJ0xkr/cPa4Aze/LgTIJq1w6JAtfbWAcKRArWFV8Ftha+4PubmrKOKUxgDIh1g2Acy8n2LnNV0H0fgMP/noaHZi8XTUVeZrI6NDkoybLFNjOIJSktKPXUms75dTezcTB5oWXxCt6K/PlVmJIejcOLA6dAuBaHQQzQAk+ojMlyGAcUsJ83ybfQJ/Dzg69d6QTiTSOK5mFEhue8rKrm1UagoiqjPj4ZlKwB6l6A/XlZscjCvgUXLT/cQ7y8NHtRJ9ErRYy8pQ7aaJN3f44=
   file:
   - release/samlare-v$VERSION-linux-amd64
   - release/samlare-v$VERSION-darwin-amd64
   skip_cleanup: true
   on:
     tags: true
-  api_key:
-    secure: CzFgvwk/UNyNSzMudN+XGcdPb/ZQ/2LWIAwgZi4wr0xF8z8N0Tj1B1a4eIixQzCVaezcMZR8GQG5HoUZapOyWNCKx9wjV9jf/T2VvU2r8GcdVDp4el2oK+uXAVe+RTsI6XS16pAbB6985ab9zyb8efnkbYBYgsTFf8F9f2YA12XniQvaCTP/+NbP14O5irFOm+BwrbVt/G6Zi4k9PwPQO0Bkq6qKwBrHE+cgzgWDBSVYDX2761IOX/MMU5rimsU2uIxaWDvWpb4W6pxarGqW7KR/bvSdB9yyjM+ggIPKSH8P8aN/va4dA/d9NpuZdYRCSud1pyymlYrCuIVa4zNkUPzpMmYFsleyR9rNtLiIA+5bjPxr/Uj641Vto4dR75mg8AvqGI2QHd/by7BJ17C0zSq6a+aJgU3q/3DPYdnjCtvEabDQE6Zj5xRByhrhArGItIVdgyNkRisBuUos+fUE7FoPpKRGvdsIGqH4a2qz17iaAEr/C3UMyaS80YQAYIU2yYwkrMVVWjVLHbXUSFbn0VdKWdKoojTiacqvJyHU5LfjB/xLh0iMNNEAio1qZjev+J7VQTg3j6/zcfspc0O+fuW/T3QHrgAnN9sAqvfFvSxwR+m5uL5Eg99OFzuZZC4kBGGjyFwLCSoquR5PJCgIrrs/EsOpm/5+pUzCiic+hCs=
