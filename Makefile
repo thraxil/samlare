@@ -2,7 +2,7 @@ samlare: *.go
 	go build .
 
 release: samlare
-	echo "current version: "
+	@echo "current version: "
 	@cat VERSION
 	@read -p "Version: " version; \
 	echo $$version > VERSION; \
