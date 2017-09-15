@@ -46,3 +46,25 @@ func Test_newEndpoint(t *testing.T) {
 		t.Error("lost the URL")
 	}
 }
+
+type dummyGraphite struct{}
+
+func (d dummyGraphite) Submit(m []metric) error {
+	return nil
+}
+
+func Test_Submit(t *testing.T) {
+	c := endpointconfig{
+		URL:           "http://example.com/",
+		Prefix:        "test",
+		CheckInterval: 60,
+		Timeout:       60,
+	}
+	var g dummyGraphite
+	e := newEndpoint(c, 60, 60, g, httpFetcher{}, dummyLogger())
+	var m []metric
+	err := e.Submit(m)
+	if err != nil {
+		t.Error("dummy submitter shouldn't return an error")
+	}
+}

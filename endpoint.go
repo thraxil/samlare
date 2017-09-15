@@ -111,11 +111,8 @@ func metricsFromMap(m map[string]interface{}, prefix string) []metric {
 	return metrics
 }
 
-func (e *endpoint) Submit(metrics []metric) {
-	err := e.graphiteServer.Submit(metrics)
-	if err != nil {
-		e.logger.Log("msg", "submission to graphite failed", "error", err)
-	}
+func (e *endpoint) Submit(metrics []metric) error {
+	return e.graphiteServer.Submit(metrics)
 }
 
 func (e *endpoint) Run(ctx context.Context) {
@@ -128,7 +125,10 @@ func (e *endpoint) Run(ctx context.Context) {
 			return
 		case <-time.After(time.Duration(e.checkInterval+jitter) * time.Second):
 			metrics := e.Gather(ctx)
-			e.Submit(metrics)
+			err := e.Submit(metrics)
+			if err != nil {
+				e.logger.Log("msg", "submission to graphite failed", "error", err)
+			}
 		}
 	}
 }
