@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/go-kit/kit/log"
 )
@@ -118,6 +119,7 @@ func Test_Fetch(t *testing.T) {
 	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
+
 	d, err := e.Fetch(ctx)
 	if err != nil {
 		t.Error("dummy fetcher shouldn't fail")
@@ -146,4 +148,43 @@ func Test_Gather(t *testing.T) {
 		t.Error("wrong number of metrics found")
 	}
 
+}
+
+func Test_Run(t *testing.T) {
+	c := endpointconfig{
+		URL:           "http://example.com/",
+		Prefix:        "test",
+		CheckInterval: 60,
+		Timeout:       60,
+	}
+	var g dummyGraphite
+	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+
+	ctx, cancel := context.WithCancel(context.TODO())
+
+	// start it and cancel immediately
+	go e.Run(ctx)
+	cancel()
+
+	// set up a full dummy run
+	c = endpointconfig{
+		URL:           "http://example.com/",
+		Prefix:        "test",
+		CheckInterval: 1,
+		Timeout:       60,
+	}
+
+	e = newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+
+	ctx, cancel = context.WithCancel(context.TODO())
+
+	// start it and cancel immediately
+	go e.Run(ctx)
+
+	// 2 second test. sucks. need to switch checkinterval to ms
+	// give it some time
+	time.Sleep(2 * time.Second)
+
+	// then cancel it
+	cancel()
 }

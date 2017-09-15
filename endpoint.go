@@ -115,15 +115,21 @@ func (e *endpoint) Submit(metrics []metric) error {
 	return e.graphiteServer.Submit(metrics)
 }
 
+func jitter(interval int) int {
+	if interval > 10 {
+		return rand.Intn(interval / 10)
+	}
+	return 0
+}
+
 func (e *endpoint) Run(ctx context.Context) {
 	e.logger.Log("msg", "endpoint starting")
 	for {
-		jitter := rand.Intn(e.checkInterval / 10)
 		select {
 		case <-ctx.Done():
 			e.logger.Log("msg", "context cancelled. exiting")
 			return
-		case <-time.After(time.Duration(e.checkInterval+jitter) * time.Second):
+		case <-time.After(time.Duration(e.checkInterval+jitter(e.checkInterval)) * time.Second):
 			metrics := e.Gather(ctx)
 			err := e.Submit(metrics)
 			if err != nil {
