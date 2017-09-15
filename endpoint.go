@@ -23,7 +23,7 @@ type endpoint struct {
 	prefix         string
 	checkInterval  int
 	timeout        int
-	graphiteServer *graphiteServer
+	graphiteServer Submitable
 	fetcher        fetcher
 	logger         log.Logger
 }
@@ -33,7 +33,7 @@ type metric struct {
 	Value float64
 }
 
-func newEndpoint(c endpointconfig, interval int, timeout int, g *graphiteServer, fetcher fetcher, logger log.Logger) *endpoint {
+func newEndpoint(c endpointconfig, interval int, timeout int, g Submitable, fetcher fetcher, logger log.Logger) *endpoint {
 	if c.CheckInterval != 0 {
 		interval = c.CheckInterval
 	}

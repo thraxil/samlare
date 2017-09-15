@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+type Submitable interface {
+	Submit([]metric) error
+}
+
 type graphiteServer struct {
 	Host string
 	Port int
