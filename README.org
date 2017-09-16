@@ -46,6 +46,7 @@ Timeout = 3000
   [endpoints.app2]
         URL = "http://localhost:14002/debug/vars"
         Prefix = "apps.app2"
+        FailureMetric = "apps.app1.failure"
 #+END_SRC
 
 The top level fields that need to be set are:
@@ -62,6 +63,13 @@ Each requires
 
 - ~URL~ -- the full URL of the endpoint
 - ~Prefix~ -- the graphite metric prefix to use
+
+Optionall, it also supports:
+
+- ~FailureMetric~ -- if this is specified, it will submit a ~1~ to
+  this metric if the fetch failed and a ~0~ otherwise. In other words,
+  this can be a simple availability check. If this isn't set, it will
+  simply ignore failed fetches.
 
 ~CheckInterval~ and ~Timeout~ can also be individually overridden for
 each endpoint as well.

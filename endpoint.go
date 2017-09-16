@@ -21,6 +21,7 @@ type httpFetcher struct{}
 type endpoint struct {
 	url            string
 	prefix         string
+	failureMetric  string
 	checkInterval  int
 	timeout        int
 	graphiteServer Submitable
@@ -45,6 +46,7 @@ func newEndpoint(c endpointconfig, interval int, timeout int, g Submitable, fetc
 		url:            c.URL,
 		prefix:         c.Prefix,
 		checkInterval:  interval,
+		failureMetric:  c.FailureMetric,
 		timeout:        timeout,
 		graphiteServer: g,
 		fetcher:        fetcher,
@@ -82,11 +84,21 @@ func (e *endpoint) Gather(ctx context.Context) []metric {
 	m, err := e.Fetch(ctx)
 	if err != nil {
 		e.logger.Log("msg", "fetch failed", "error", err)
+		if e.failureMetric != "" {
+			// failure
+			f := metric{Name: e.failureMetric, Value: 1.0}
+			metrics = append(metrics, f)
+		}
 		return metrics
 	}
 	e.logger.Log("msg", "good fetch")
 
 	metrics = metricsFromMap(m, e.prefix)
+	// success
+	if e.failureMetric != "" {
+		s := metric{Name: e.failureMetric, Value: 0.0}
+		metrics = append(metrics, s)
+	}
 
 	return metrics
 }

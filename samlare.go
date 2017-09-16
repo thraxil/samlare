@@ -16,6 +16,7 @@ type endpointconfig struct {
 	Prefix        string
 	CheckInterval int
 	Timeout       int
+	FailureMetric string
 }
 
 type config struct {

@@ -1,3 +1,5 @@
 * 1.0.0
 
 - switched ~CheckInterval~ from seconds to milliseconds
+- log failure to graphite when fetch fails (if ~FailureMetric~ is
+  defined for the endpoint)

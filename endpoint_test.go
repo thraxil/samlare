@@ -150,6 +150,26 @@ func Test_Gather(t *testing.T) {
 
 }
 
+func Test_GatherWithFailureMetric(t *testing.T) {
+	c := endpointconfig{
+		URL:           "http://example.com/",
+		Prefix:        "test",
+		CheckInterval: 60,
+		Timeout:       60,
+		FailureMetric: "failure",
+	}
+	g := newGraphiteServer("1.2.3.4", 2003)
+	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+
+	ctx := context.TODO()
+	metrics := e.Gather(ctx)
+
+	if len(metrics) != 3 {
+		t.Error("wrong number of metrics found")
+	}
+
+}
+
 func Test_Run(t *testing.T) {
 	c := endpointconfig{
 		URL:           "http://example.com/",
