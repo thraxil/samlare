@@ -1,6 +1,6 @@
 CarbonHost = "graphite.example.com"
 CarbonPort = 2003
-CheckInterval = 60
+CheckInterval = 60000
 Timeout = 3000
 
 [endpoints]
