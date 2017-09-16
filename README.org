@@ -34,7 +34,7 @@ something like:
 #+BEGIN_SRC toml
 CarbonHost = "graphite.example.com"
 CarbonPort = 2003
-CheckInterval = 60
+CheckInterval = 60000
 Timeout = 3000
 
 [endpoints]
@@ -52,7 +52,7 @@ The top level fields that need to be set are:
 
 - ~CarbonHost~ -- hostname/ip of your carbon server
 - ~CarbonPort~ -- port for your carbon server
-- ~CheckInterval~ -- how many seconds between checks
+- ~CheckInterval~ -- how many milliseconds between checks
 - ~Timeout~ -- max milliseconds to wait for a response from each
   endpoint
 

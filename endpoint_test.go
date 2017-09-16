@@ -181,9 +181,7 @@ func Test_Run(t *testing.T) {
 	// start it and cancel immediately
 	go e.Run(ctx)
 
-	// 2 second test. sucks. need to switch checkinterval to ms
-	// give it some time
-	time.Sleep(2 * time.Second)
+	time.Sleep(2 * time.Millisecond)
 
 	// then cancel it
 	cancel()

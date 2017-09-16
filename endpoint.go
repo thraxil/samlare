@@ -129,7 +129,7 @@ func (e *endpoint) Run(ctx context.Context) {
 		case <-ctx.Done():
 			e.logger.Log("msg", "context cancelled. exiting")
 			return
-		case <-time.After(time.Duration(e.checkInterval+jitter(e.checkInterval)) * time.Second):
+		case <-time.After(time.Duration(e.checkInterval+jitter(e.checkInterval)) * time.Millisecond):
 			metrics := e.Gather(ctx)
 			err := e.Submit(metrics)
 			if err != nil {
