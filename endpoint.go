@@ -96,8 +96,6 @@ func metricsFromMap(m map[string]interface{}, prefix string) []metric {
 	for k, v := range m {
 		key := fmt.Sprintf("%s.%s", prefix, k)
 		switch vv := v.(type) {
-		case int:
-			metrics = append(metrics, metric{key, float64(vv)})
 		case float64:
 			metrics = append(metrics, metric{key, vv})
 		case map[string]interface{}:
