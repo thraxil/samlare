@@ -34,7 +34,7 @@ type config struct {
 	IgnoreMetrics []string
 	Renames       []renameConfig
 
-	Endpoints map[string]endpointconfig
+	Endpoint []endpointconfig
 }
 
 func loadConfig(configFile string) (*config, error) {
@@ -95,8 +95,8 @@ func startEndpoints(conf *config, logger log.Logger) context.CancelFunc {
 
 	g := newGraphiteServer(conf.CarbonHost, conf.CarbonPort)
 
-	for k, endpoint := range conf.Endpoints {
-		elogger := log.With(logger, "endpoint", k)
+	for _, endpoint := range conf.Endpoint {
+		elogger := log.With(logger, "endpoint", endpoint.Prefix)
 		e := newEndpoint(endpoint, conf.CheckInterval, conf.Timeout, conf.IgnoreMetrics, conf.Renames, g, httpFetcher{}, elogger)
 		go e.Run(ctx)
 	}

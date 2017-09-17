@@ -12,13 +12,10 @@ To = "sys"
 From = "BuckHashSys"
 To = "buck_hash_sys"
 	
+[[endpoint]]
+URL = "http://localhost:14001/debug/vars"
+Prefix = "apps.app1"
 
-[endpoints]
-
-  [endpoints.app1]
-	URL = "http://localhost:14001/debug/vars"
-	Prefix = "apps.app1"
-
-  [endpoints.app2]
-	URL = "http://localhost:14002/debug/vars"
-	Prefix = "apps.app2"
+[[endpoint]]
+URL = "http://localhost:14002/debug/vars"
+Prefix = "apps.app2"

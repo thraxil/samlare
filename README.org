@@ -44,16 +44,14 @@ CarbonPort = 2003
 CheckInterval = 60000
 Timeout = 3000
 
-[endpoints]
+[[endpoint]]
+URL = "http://localhost:14001/debug/vars"
+Prefix = "apps.app1"
 
-  [endpoints.app1]
-        URL = "http://localhost:14001/debug/vars"
-        Prefix = "apps.app1"
-
-  [endpoints.app2]
-        URL = "http://localhost:14002/debug/vars"
-        Prefix = "apps.app2"
-        FailureMetric = "apps.app1.failure"
+[[endpoint]]
+URL = "http://localhost:14002/debug/vars"
+Prefix = "apps.app2"
+FailureMetric = "apps.app1.failure"
 
 [[rename]]
 From = "BuckHashSys"

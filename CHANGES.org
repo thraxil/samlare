@@ -5,3 +5,4 @@
   defined for the endpoint)
 - metric ignore list
 - metric renaming
+- changed endpoint config syntax
