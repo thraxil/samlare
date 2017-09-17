@@ -11,6 +11,11 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
+type renameConfig struct {
+	From string
+	To   string
+}
+
 type endpointconfig struct {
 	URL           string
 	Prefix        string
@@ -18,6 +23,7 @@ type endpointconfig struct {
 	Timeout       int
 	FailureMetric string
 	IgnoreMetrics []string
+	Renames       []renameConfig
 }
 
 type config struct {
@@ -26,6 +32,7 @@ type config struct {
 	CheckInterval int
 	Timeout       int
 	IgnoreMetrics []string
+	Renames       []renameConfig
 
 	Endpoints map[string]endpointconfig
 }
@@ -90,7 +97,7 @@ func startEndpoints(conf *config, logger log.Logger) context.CancelFunc {
 
 	for k, endpoint := range conf.Endpoints {
 		elogger := log.With(logger, "endpoint", k)
-		e := newEndpoint(endpoint, conf.CheckInterval, conf.Timeout, conf.IgnoreMetrics, g, httpFetcher{}, elogger)
+		e := newEndpoint(endpoint, conf.CheckInterval, conf.Timeout, conf.IgnoreMetrics, conf.Renames, g, httpFetcher{}, elogger)
 		go e.Run(ctx)
 	}
 

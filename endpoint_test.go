@@ -18,18 +18,36 @@ func Test_metricsFromMap(t *testing.T) {
 	var f interface{}
 	json.Unmarshal([]byte(data), &f)
 	ignore := make(map[string]struct{})
-	metrics := metricsFromMap(f.(map[string]interface{}), "", ignore)
+	renames := make(map[string]string)
+	metrics := metricsFromMap(f.(map[string]interface{}), "", ignore, renames)
 	if len(metrics) != 2 {
 		t.Error("wrong number of metrics found")
 	}
 
 	data = `{"foo": 10, "bar": 5, "baz": {"blah": 3}}`
 	json.Unmarshal([]byte(data), &f)
-	metrics = metricsFromMap(f.(map[string]interface{}), "", ignore)
+	metrics = metricsFromMap(f.(map[string]interface{}), "", ignore, renames)
 	if len(metrics) != 3 {
 		t.Error("wrong number of metrics found")
 	}
 
+}
+
+func Test_metricsFromMapRename(t *testing.T) {
+	data := `{"foo": 10, "bar": 5}`
+	var f interface{}
+	json.Unmarshal([]byte(data), &f)
+	ignore := make(map[string]struct{})
+	renames := make(map[string]string)
+	renames["foo"] = "FOO"
+	renames["bar"] = "BAR"
+	metrics := metricsFromMap(f.(map[string]interface{}), "", ignore, renames)
+	if len(metrics) != 2 {
+		t.Error("wrong number of metrics found")
+	}
+	if metrics[0].Name != ".FOO" || metrics[1].Name != ".BAR" {
+		t.Error("didn't rename metric correctly", metrics[0].Name, metrics[1].Name)
+	}
 }
 
 func dummyLogger() log.Logger {
@@ -47,7 +65,7 @@ func Test_newEndpoint(t *testing.T) {
 		Timeout:       60,
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, []string{}, g, httpFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, httpFetcher{}, dummyLogger())
 	if e.url != c.URL {
 		t.Error("lost the URL")
 	}
@@ -67,7 +85,7 @@ func Test_Submit(t *testing.T) {
 		Timeout:       60,
 	}
 	var g dummyGraphite
-	e := newEndpoint(c, 60, 60, []string{}, g, httpFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, httpFetcher{}, dummyLogger())
 	var m []metric
 	err := e.Submit(m)
 	if err != nil {
@@ -117,7 +135,7 @@ func Test_Fetch(t *testing.T) {
 		Timeout:       60,
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 
@@ -126,7 +144,8 @@ func Test_Fetch(t *testing.T) {
 		t.Error("dummy fetcher shouldn't fail")
 	}
 	ignore := make(map[string]struct{})
-	metrics := metricsFromMap(d, "", ignore)
+	renames := make(map[string]string)
+	metrics := metricsFromMap(d, "", ignore, renames)
 	if len(metrics) != 2 {
 		t.Error("wrong number of metrics found")
 	}
@@ -141,7 +160,7 @@ func Test_Gather(t *testing.T) {
 		Timeout:       60,
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 	metrics := e.Gather(ctx)
@@ -161,7 +180,7 @@ func Test_GatherIgnoreMetric(t *testing.T) {
 		IgnoreMetrics: []string{"foo"},
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 	metrics := e.Gather(ctx)
@@ -181,7 +200,7 @@ func Test_GatherWithFailureMetric(t *testing.T) {
 		FailureMetric: "failure",
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 	metrics := e.Gather(ctx)
@@ -200,7 +219,7 @@ func Test_Run(t *testing.T) {
 		Timeout:       60,
 	}
 	var g dummyGraphite
-	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx, cancel := context.WithCancel(context.TODO())
 
@@ -216,7 +235,7 @@ func Test_Run(t *testing.T) {
 		Timeout:       60,
 	}
 
-	e = newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+	e = newEndpoint(c, 60, 60, []string{}, []renameConfig{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx, cancel = context.WithCancel(context.TODO())
 

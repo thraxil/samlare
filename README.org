@@ -54,6 +54,15 @@ Timeout = 3000
         URL = "http://localhost:14002/debug/vars"
         Prefix = "apps.app2"
         FailureMetric = "apps.app1.failure"
+
+[[rename]]
+From = "BuckHashSys"
+To = "buck_hash_sys"
+
+[[rename]]
+From = "Sys"
+To = "sys"
+
 #+END_SRC
 
 The top level fields that need to be set are:
@@ -85,6 +94,13 @@ Optionall, it also supports:
 
 ~CheckInterval~ and ~Timeout~ can also be individually overridden for
 each endpoint as well.
+
+Finally, you can tell it to rename metrics. Eg, expvar generally
+outputs camelCase variables, but perhaps you have standardized on all
+lower case and underscores for your graphite metrics. Just add as many
+~[[[[rename]]]]~ blocks as you need (yeah, you have to explicitly do
+each. If you want to add support for general renaming policies, I'd
+take a patch). That can also be overridden on a per-endpoint basis.
 
 ** Additional Features
 

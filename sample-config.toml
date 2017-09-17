@@ -4,6 +4,15 @@ CheckInterval = 60000
 Timeout = 3000
 IgnoreMetrics = ["cmdline", "foo"]
 
+[[rename]]
+From = "Sys"
+To = "sys"
+
+[[rename]]
+From = "BuckHashSys"
+To = "buck_hash_sys"
+	
+
 [endpoints]
 
   [endpoints.app1]

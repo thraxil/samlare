@@ -25,6 +25,7 @@ type endpoint struct {
 	checkInterval  int
 	timeout        int
 	ignoreMetrics  map[string]struct{}
+	renames        map[string]string
 	graphiteServer Submitable
 	fetcher        fetcher
 	logger         log.Logger
@@ -35,7 +36,7 @@ type metric struct {
 	Value float64
 }
 
-func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []string, g Submitable, fetcher fetcher, logger log.Logger) *endpoint {
+func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []string, renameMetrics []renameConfig, g Submitable, fetcher fetcher, logger log.Logger) *endpoint {
 	if c.CheckInterval != 0 {
 		interval = c.CheckInterval
 	}
@@ -49,6 +50,10 @@ func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []st
 	for _, m := range ignoreMetrics {
 		ignoreMap[m] = struct{}{}
 	}
+	renameMap := make(map[string]string)
+	for _, r := range c.Renames {
+		renameMap[r.From] = r.To
+	}
 
 	return &endpoint{
 		url:            c.URL,
@@ -57,6 +62,7 @@ func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []st
 		failureMetric:  c.FailureMetric,
 		timeout:        timeout,
 		ignoreMetrics:  ignoreMap,
+		renames:        renameMap,
 		graphiteServer: g,
 		fetcher:        fetcher,
 		logger:         logger,
@@ -102,7 +108,7 @@ func (e *endpoint) Gather(ctx context.Context) []metric {
 	}
 	e.logger.Log("msg", "good fetch")
 
-	metrics = metricsFromMap(m, e.prefix, e.ignoreMetrics)
+	metrics = metricsFromMap(m, e.prefix, e.ignoreMetrics, e.renames)
 	// success
 	if e.failureMetric != "" {
 		s := metric{Name: e.failureMetric, Value: 0.0}
@@ -112,19 +118,23 @@ func (e *endpoint) Gather(ctx context.Context) []metric {
 	return metrics
 }
 
-func metricsFromMap(m map[string]interface{}, prefix string, ignore map[string]struct{}) []metric {
+func metricsFromMap(m map[string]interface{}, prefix string, ignore map[string]struct{}, renames map[string]string) []metric {
 	var metrics []metric
 	for k, v := range m {
-		_, exists := ignore[k]
-		if exists {
+		_, ok := ignore[k]
+		if ok {
 			continue
+		}
+		t, ok := renames[k]
+		if ok {
+			k = t
 		}
 		key := fmt.Sprintf("%s.%s", prefix, k)
 		switch vv := v.(type) {
 		case float64:
 			metrics = append(metrics, metric{key, vv})
 		case map[string]interface{}:
-			nmetrics := metricsFromMap(vv, key, ignore)
+			nmetrics := metricsFromMap(vv, key, ignore, renames)
 			for _, met := range nmetrics {
 				metrics = append(metrics, met)
 			}

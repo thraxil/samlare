@@ -4,3 +4,4 @@
 - log failure to graphite when fetch fails (if ~FailureMetric~ is
   defined for the endpoint)
 - metric ignore list
+- metric renaming
