@@ -98,7 +98,7 @@ each endpoint as well.
 Finally, you can tell it to rename metrics. Eg, expvar generally
 outputs camelCase variables, but perhaps you have standardized on all
 lower case and underscores for your graphite metrics. Just add as many
-~[[[[rename]]]]~ blocks as you need (yeah, you have to explicitly do
+~[[rename]]~ blocks as you need (yeah, you have to explicitly do
 each. If you want to add support for general renaming policies, I'd
 take a patch). That can also be overridden on a per-endpoint basis.
 
