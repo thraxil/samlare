@@ -9,7 +9,7 @@ release: samlare
 	git commit -a -m "release version $$version"; \
 	git tag -a v$$version -m "release $$version"; \
 	git push --tags origin master; \
-	docker build -t thraxil/samlare:$$version; \
+	docker build -t thraxil/samlare:$$version .; \
 	docker push thraxil/samlare:$$version
 
 .PHONY: release
