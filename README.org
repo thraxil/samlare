@@ -77,6 +77,11 @@ Optionall, it also supports:
   this metric if the fetch failed and a ~0~ otherwise. In other words,
   this can be a simple availability check. If this isn't set, it will
   simply ignore failed fetches.
+- ~IgnoreMetrics~ - a list of metric names (corresponding to keys in
+  the expvar JSON) that will just be ignored and not passed along to
+  graphite. Handy if there are metrics that you just don't care about
+  and would rather that they don't take up space on your graphite
+  server.
 
 ~CheckInterval~ and ~Timeout~ can also be individually overridden for
 each endpoint as well.

@@ -17,6 +17,7 @@ type endpointconfig struct {
 	CheckInterval int
 	Timeout       int
 	FailureMetric string
+	IgnoreMetrics []string
 }
 
 type config struct {
@@ -24,6 +25,7 @@ type config struct {
 	CarbonPort    int
 	CheckInterval int
 	Timeout       int
+	IgnoreMetrics []string
 
 	Endpoints map[string]endpointconfig
 }
@@ -88,7 +90,7 @@ func startEndpoints(conf *config, logger log.Logger) context.CancelFunc {
 
 	for k, endpoint := range conf.Endpoints {
 		elogger := log.With(logger, "endpoint", k)
-		e := newEndpoint(endpoint, conf.CheckInterval, conf.Timeout, g, httpFetcher{}, elogger)
+		e := newEndpoint(endpoint, conf.CheckInterval, conf.Timeout, conf.IgnoreMetrics, g, httpFetcher{}, elogger)
 		go e.Run(ctx)
 	}
 

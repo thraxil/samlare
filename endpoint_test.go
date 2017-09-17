@@ -17,14 +17,15 @@ func Test_metricsFromMap(t *testing.T) {
 	data := `{"foo": 10, "bar": 5}`
 	var f interface{}
 	json.Unmarshal([]byte(data), &f)
-	metrics := metricsFromMap(f.(map[string]interface{}), "")
+	ignore := make(map[string]struct{})
+	metrics := metricsFromMap(f.(map[string]interface{}), "", ignore)
 	if len(metrics) != 2 {
 		t.Error("wrong number of metrics found")
 	}
 
 	data = `{"foo": 10, "bar": 5, "baz": {"blah": 3}}`
 	json.Unmarshal([]byte(data), &f)
-	metrics = metricsFromMap(f.(map[string]interface{}), "")
+	metrics = metricsFromMap(f.(map[string]interface{}), "", ignore)
 	if len(metrics) != 3 {
 		t.Error("wrong number of metrics found")
 	}
@@ -46,7 +47,7 @@ func Test_newEndpoint(t *testing.T) {
 		Timeout:       60,
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, g, httpFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, g, httpFetcher{}, dummyLogger())
 	if e.url != c.URL {
 		t.Error("lost the URL")
 	}
@@ -66,7 +67,7 @@ func Test_Submit(t *testing.T) {
 		Timeout:       60,
 	}
 	var g dummyGraphite
-	e := newEndpoint(c, 60, 60, g, httpFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, g, httpFetcher{}, dummyLogger())
 	var m []metric
 	err := e.Submit(m)
 	if err != nil {
@@ -116,7 +117,7 @@ func Test_Fetch(t *testing.T) {
 		Timeout:       60,
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 
@@ -124,7 +125,8 @@ func Test_Fetch(t *testing.T) {
 	if err != nil {
 		t.Error("dummy fetcher shouldn't fail")
 	}
-	metrics := metricsFromMap(d, "")
+	ignore := make(map[string]struct{})
+	metrics := metricsFromMap(d, "", ignore)
 	if len(metrics) != 2 {
 		t.Error("wrong number of metrics found")
 	}
@@ -139,12 +141,32 @@ func Test_Gather(t *testing.T) {
 		Timeout:       60,
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 	metrics := e.Gather(ctx)
 
 	if len(metrics) != 2 {
+		t.Error("wrong number of metrics found")
+	}
+
+}
+
+func Test_GatherIgnoreMetric(t *testing.T) {
+	c := endpointconfig{
+		URL:           "http://example.com/",
+		Prefix:        "test",
+		CheckInterval: 60,
+		Timeout:       60,
+		IgnoreMetrics: []string{"foo"},
+	}
+	g := newGraphiteServer("1.2.3.4", 2003)
+	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
+
+	ctx := context.TODO()
+	metrics := e.Gather(ctx)
+
+	if len(metrics) != 1 {
 		t.Error("wrong number of metrics found")
 	}
 
@@ -159,7 +181,7 @@ func Test_GatherWithFailureMetric(t *testing.T) {
 		FailureMetric: "failure",
 	}
 	g := newGraphiteServer("1.2.3.4", 2003)
-	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx := context.TODO()
 	metrics := e.Gather(ctx)
@@ -178,7 +200,7 @@ func Test_Run(t *testing.T) {
 		Timeout:       60,
 	}
 	var g dummyGraphite
-	e := newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+	e := newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx, cancel := context.WithCancel(context.TODO())
 
@@ -194,7 +216,7 @@ func Test_Run(t *testing.T) {
 		Timeout:       60,
 	}
 
-	e = newEndpoint(c, 60, 60, g, dummyFetcher{}, dummyLogger())
+	e = newEndpoint(c, 60, 60, []string{}, g, dummyFetcher{}, dummyLogger())
 
 	ctx, cancel = context.WithCancel(context.TODO())
 
