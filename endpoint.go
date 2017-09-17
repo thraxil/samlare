@@ -46,12 +46,15 @@ func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []st
 	if len(c.IgnoreMetrics) > 0 {
 		ignoreMetrics = c.IgnoreMetrics
 	}
+	if len(c.Renames) > 0 {
+		renameMetrics = c.Renames
+	}
 	ignoreMap := make(map[string]struct{})
 	for _, m := range ignoreMetrics {
 		ignoreMap[m] = struct{}{}
 	}
 	renameMap := make(map[string]string)
-	for _, r := range c.Renames {
+	for _, r := range renameMetrics {
 		renameMap[r.From] = r.To
 	}
 
