@@ -26,7 +26,7 @@ type endpoint struct {
 	timeout        int
 	ignoreMetrics  map[string]struct{}
 	renames        map[string]string
-	graphiteServer Submitable
+	graphiteServer submitable
 	fetcher        fetcher
 	logger         log.Logger
 }
@@ -36,7 +36,7 @@ type metric struct {
 	Value float64
 }
 
-func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []string, renameMetrics []renameConfig, g Submitable, fetcher fetcher, logger log.Logger) *endpoint {
+func newEndpoint(c endpointconfig, interval int, timeout int, ignoreMetrics []string, renameMetrics []renameConfig, g submitable, fetcher fetcher, logger log.Logger) *endpoint {
 	if c.CheckInterval != 0 {
 		interval = c.CheckInterval
 	}

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Submitable interface {
+type submitable interface {
 	Submit([]metric) error
 }
 
