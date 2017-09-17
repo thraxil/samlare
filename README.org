@@ -15,7 +15,14 @@ know if you need it for other platforms). Download it from the
 [[https://github.com/thraxil/samlare/releases][releases]] and put it in your path (and probably rename it, set
 permissions, etc).
 
-Docker image also coming soon.
+It is also available as a docker image (~thraxil/samlare~ on the
+docker hub):
+
+#+BEGIN_EXAMPLE
+$ docker pull thraxil/samlare
+$ docker run -v /path/to/my/config.toml:/etc/samlare/config.toml thraxil/samlare
+#+END_EXAMPLE
+
 ** Configuration
 
 The only commandline argument it takes is a path to a config file (it
