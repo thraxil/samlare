@@ -7,6 +7,8 @@ Samlare (it means "collector/gatherer" in swedish) is a simple tool
 for collecting data from [[https://golang.org/pkg/expvar/][expvar]] endpoints and submitting it to
 [[https://graphiteapp.org/][graphite]].
 
+I also wrote a short [[https://thraxil.org/users/anders/posts/2017/09/24/Samlare-expvar-to-Graphite/][blog post]] introducing samlare.
+
 ** Installation
 
 It's available for Linux as a plain binary for linux or OS X (let me
